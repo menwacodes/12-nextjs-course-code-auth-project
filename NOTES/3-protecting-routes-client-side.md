@@ -1,4 +1,5 @@
 # Protecting Routes Client Side
+- Likely going to want [server-side protection](4-protecting-routes-server-side.md) so start there
 - Start on the page that needs to be protected or restricted
 - Use next-auth either on that page or on a component that page renders
 - <span class="computer-text">getSession()</span> sends a new request and gets the latest session data
