@@ -5,7 +5,7 @@
   - getStaticProps runs at build time and optionally rebuilds on a time interval
 - This would replace client-side route protection, if exists
 
-Below in the getServerSideProps function,
+Below in the getServerSideProps function of the /pages/profile.js file,
 - Get session automatically looks into the request to extract the session token cookie
 - Session is null if the user is not auth and a valid session object if auth
 - Permanent is set to false to make it clear that it's only one time due to user not being logged in

@@ -1,3 +1,12 @@
+# Redirect After Login
+- Once the user logs in, shouldn't be on auth-form page any longer
+- To maintain SPA state, do not use <span class="monospace">window.location.href="/"</span>, instead utilize useRouter
+- The promise useRouter().replace(URL) returns can be ignored
+- Could use [server-side](4-protecting-routes-server-side.md) protection, below uses [client-side](3-protecting-routes-client-side.md)
+
+## /components/auth/auth-form.js
+- Lines 4, 23, and 49-51
+```js
 import {useRef, useState} from 'react';
 import classes from './auth-form.module.css';
 import {signIn} from "next-auth/client.js";
@@ -88,3 +97,37 @@ function AuthForm() {
 }
 
 export default AuthForm;
+```
+
+## /pages/auth.js
+- If there is a session, the user is authenticated and shouldn't be on the auth page
+- Line 12 looks for the session to return this info, Line 14 is executed if there is an active session
+```js
+import {getSession} from "next-auth/client.js";
+import {useRouter} from "next/router.js";
+import {useEffect, useState} from "react";
+import AuthForm from '../components/auth/auth-form';
+
+function AuthPage() {
+    const [isLoading, setIsLoading] = useState(true);
+
+    const router = useRouter();
+
+    useEffect(() => {
+            getSession().then(session => {
+                if (session) { 
+                    router.replace("/");
+                } else {
+                    setIsLoading(false);
+                }
+            });
+        }, []
+    );
+
+    if (isLoading) return <p>Loading...</p>
+
+    return <AuthForm/>;
+}
+
+export default AuthPage;
+```
