@@ -87,6 +87,7 @@ export const passwordsEqual = async (plainTextPw, hashedPw) => await compare(pla
     - Creates an http-only cookie with {next-auth.session-token: JWT}
     - May make sense to use React.Context to guide visibility but need a permanent solution
 - In the form below, Lines 39-45 do the magic of logging in, handling invalid login with feedback not included
+
 ```js
 import {useRef, useState} from 'react';
 import classes from './auth-form.module.css';
@@ -180,48 +181,85 @@ export default AuthForm;
 - Change options in header based on a user being authenticated
 - NextAuth automatically uses the http-only cookie token when a protected route is accessed and can be used to change
   what's visible on the screen
-- Next provides the answer to whether the user using the page is authenticated 
-  - <span class="computer-text">useSession()</span> hook which can be used in any functional React component
-  - Returns an array with two elements: sessionObject & loading (name these whatever)
-  - sessionObject describes the active session
-  - loading boolean whether Next is still figuring out if the user is logged in
+- Next provides the answer to whether the user using the page is authenticated
+    - <span class="computer-text">useSession()</span> hook which can be used in any functional React component
+    - Returns an array with two elements: sessionObject & loading (name these whatever)
+    - sessionObject describes the active session
+    - loading boolean whether Next is still figuring out if the user is logged in
 - sessionObject
-  - {expires, user: {email, image, name}}
-  - the session is prolonged automatically if the user is active
+    - {expires, user: {email, image, name}}
+    - the session is prolonged automatically if the user is active
 
 Below, the return values from <span class="computer-text">useSession()</span> are used to show / hide nav items
+
 ```js
 import Link from 'next/link';
-import {useSession}  from 'next-auth/client.js'
+import {useSession} from 'next-auth/client.js'
 
 import classes from './main-navigation.module.css';
 
 function MainNavigation() {
-  const [sessionObject, loading] = useSession()
+    const [sessionObject, loading] = useSession()
 
-  return (
-    <header className={classes.header}>
-      <Link href='/'>
-        <a>
-          <div className={classes.logo}>Next Auth</div>
-        </a>
-      </Link>
-      <nav>
-        <ul>
-          <li>
-            {!sessionObject && !loading (<Link href="/auth">Login</Link>)}
-          </li>
-          <li>
-            {sessionObject && (<Link href="/profile">Profile</Link>)}
-          </li>
-            {sessionObject && (<li>
-                <button>Logout</button>
-            </li>)}
-        </ul>
-      </nav>
-    </header>
-  );
+    return (
+        <header className={classes.header}>
+            <Link href='/'>
+                <a>
+                    <div className={classes.logo}>Next Auth</div>
+                </a>
+            </Link>
+            <nav>
+                <ul>
+                    <li>
+                        {!sessionObject && !loading(<Link href="/auth">Login</Link>)}
+                    </li>
+                    <li>
+                        {sessionObject && (<Link href="/profile">Profile</Link>)}
+                    </li>
+                    {sessionObject && (<li>
+                        <button>Logout</button>
+                    </li>)}
+                </ul>
+            </nav>
+        </header>
+    );
 }
 
 export default MainNavigation;
+```
+
+## Logout
+
+- 'next-auth/client' provides a <span class="computer-text">signOut()</span> function to log users out
+- signOut returns a promise but doesn't need to be handled to sign the user out
+- using MainNavigation from directly above:
+
+```js
+import {useSession, signOut} from 'next-auth/client.js'
+
+function MainNavigation() {
+  const [sessionObject, loading] = useSession();
+
+  const logoutHandler = () => {
+    signOut()
+  }
+  return (
+          // more stuff 
+          <nav>
+            <ul>
+              <li>
+                {!sessionObject && !loading && (<Link href="/auth">Login</Link>)}
+              </li>
+              <li>
+                {sessionObject && (<Link href="/profile">Profile</Link>)}
+              </li>
+              {sessionObject && (
+                      <li>
+                        <button onClick={logoutHandler}>Logout</button>
+                      </li>)
+              }
+            </ul>
+          </nav>
+  )
+}
 ```
