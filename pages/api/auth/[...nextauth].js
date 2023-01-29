@@ -14,14 +14,14 @@ const nextAuthConfig = {
                 const usersCollection = client.db().collection("users");
                 const user = await usersCollection.findOne({email: credentials.email});
                 if (!user) {
-                    client.close()
+                    client.close();
                     throw new Error("No User Found");
                 }
 
                 // is their password correct
                 const passwordGood = await passwordsEqual(credentials.password, user.password);
                 if (!passwordGood) {
-                    client.close()
+                    client.close();
                     throw new Error("Bad PW");
                 }
 
